@@ -1,63 +1,60 @@
 from django.db import models
 from django.utils import timezone
 
-
-class Entrenador(models.Model):
-    nombre = models.CharField(max_length=100)
-    dni = models.CharField(max_length=40, unique=True)
-    apellido = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    telefono = models.CharField(max_length=40)
-
-      
-    def _str_(self):
-        return {self.nombre}
-
-
-
 class Area(models.Model):
     nombre = models.CharField(max_length=100)  
-    descripcion = models.CharField(max_length=100) 
-    activo = models.BooleanField(default=True) 
+    descripcion = models.TextField(blank=True, null=True) 
     categoria = models.CharField(max_length=50) 
+    activo = models.BooleanField(default=True) 
 
 
     def _str_(self):
-        return {self.nombre}
+        return f"{self.nombre}"
 
 
 class Espacio(models.Model):
-    nombre = models.CharField(max_length=100)
+    nombre = models.CharField(max_length=100, unique=True)
     tipo_area = models.CharField(max_length=100)
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
     propietario = models.CharField(max_length=100, blank=True, null=True)
 
     def _str_(self):
-        return f"{self.nombre} ({self.area.nombre})"
-        
+        return f"{self.nombre} ({self.area.nombre}"
 
 
-class Actividad(models.Model):
+class Entrenador(models.Model):
+    dni = models.CharField(max_length=9, unique=True)
     nombre = models.CharField(max_length=100)
-    entrenador = models.ForeignKey(Entrenador, on_delete=models.CASCADE)
-    tipo_Actividad = models.CharField(max_length=100)
-    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    apellido = models.CharField(max_length=100)
+    email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
 
-    def _str_(self):
-        return self.nombre
-
-class Evento(models.Model):
-    nombre = models.CharField(max_length=100)
-    fecha = models.DateTimeField(default=timezone.now)
-    actividades = models.ManyToManyField(Actividad, related_name='eventos', blank=True)
-    espacio_fisico = models.ForeignKey(Espacio, on_delete=models.CASCADE)
 
     def _str_(self):
         return f"{self.nombre}"
 
-class Socio(models.Model):
+class Actividad(models.Model):
+    tipo_Actividad = models.CharField(max_length=100)
     nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    entrenador = models.ForeignKey(Entrenador, on_delete=models.CASCADE)
+
+    def _str_(self):
+        return f"{self.nombre}"
+
+class Evento(models.Model):
+    nombre = models.CharField(max_length=200)
+    fecha = models.DateTimeField(default=timezone.now)
+    espacio = models.ForeignKey(Espacio, on_delete=models.CASCADE)
+    actividades = models.ManyToManyField(Actividad, related_name='eventos', blank=True)
+
+    def _str_(self):
+        return f"{self.nombre} - {self.fecha.strftime('%Y-%m-%d %H:%M')}"
+
+
+class Socio(models.Model):
+    nombre = models.CharField(max_length=200)
+    apellido = models.CharField(max_length=200)
     email = models.EmailField()
     telefono = models.CharField(max_length=20, blank=True, null=True)
     actividades = models.ManyToManyField(Actividad, related_name='socios', blank=True)
