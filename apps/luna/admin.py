@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Area, Espacio, Entrenador, Actividad, Evento, Socio
+from .models import Entrenador, Actividad, Area, Espacio, Socio, Evento
 
 admin.site.register(Entrenador)
 admin.site.register(Actividad)
